@@ -1,5 +1,5 @@
 ---
-title: Airtable Agent
+title: Receipt Generator Agent Demo
 emoji: 🚀
 colorFrom: red
 colorTo: red
