@@ -1,6 +1,6 @@
 # app.py
 import streamlit as st
-from src.main import ask_agent_sync
+from main import ask_agent_sync
 
 st.set_page_config(page_title="GitHub Agent Chatbot", page_icon=":robot:")
 st.title("GitHub Agent Chatbot")

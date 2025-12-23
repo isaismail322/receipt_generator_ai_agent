@@ -1,6 +1,6 @@
 ﻿import asyncio
 import nest_asyncio
-from .agent import agent
+from agent import agent
 nest_asyncio.apply()
 
 
