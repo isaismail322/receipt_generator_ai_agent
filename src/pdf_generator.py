@@ -13,6 +13,7 @@ def pdf_receipt_generator(data_input_api):
     
     y_position = height - 50  # start from top
 
+
     c.setFont("Helvetica-Bold", 14)
     c.drawString(50, y_position, "TRIP RECEIPT")
     y_position -= 30
