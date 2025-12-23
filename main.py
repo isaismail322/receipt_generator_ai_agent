@@ -3,8 +3,10 @@ import nest_asyncio
 from agent import agent
 nest_asyncio.apply()
 
+
+# To Run in Terminal
 # async def main():
-#     print("GitHub Agent Ready! Ask questions about GitHub repositories.")
+#     print("GitHub Agent Ready! Ask questions about Receipts Data")
 #     print("Type 'quit' to exit.\n")
 
 #     history = None
@@ -22,6 +24,9 @@ nest_asyncio.apply()
 
 
 
+
+
+# For Deployment in Production
 async def ask_agent(prompt: str, history=None):
     """
     Run the agent on a single prompt.
@@ -31,6 +36,7 @@ async def ask_agent(prompt: str, history=None):
     return {"output": result.output, "history": result.all_messages()}
 
 # Helper function to call from synchronous code
+# Discarded
 # def ask_agent_sync(prompt: str, history=None):
 #     return asyncio.run(ask_agent(prompt, history))
 
