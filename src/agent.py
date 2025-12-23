@@ -4,7 +4,7 @@ from pydantic_ai import Agent, RunContext
 from pydantic import BaseModel, Field
 import httpx
 from io import BytesIO
-from .pdf_generator import pdf_receipt_generator
+from pdf_generator import pdf_receipt_generator
 # from airbyte_agent_github import GithubConnector
 # from airbyte_agent_github.models import GithubGithubPersonalAccessTokenAuthConfig
 load_dotenv()
