@@ -25,3 +25,18 @@ def pdf_receipt_generator(data_input_api):
         y_position -= 20  # move down for next line
     c.save()
     pdf_buffer.seek(0)
+    return pdf_buffer
+
+# testing
+# test_data = {
+#         "trip_id": "12345",
+#         "passenger_name": "John Doe",
+#         "pickup": "123 Main St",
+#         "dropoff": "456 Oak Ave",
+#         "fare": "$25.00",
+#         "date": "2025-01-01"
+#     }
+
+# pdf_buffer = pdf_receipt_generator(test_data)
+# with open("test_receipt.pdf", "wb") as f:
+#     f.write(pdf_buffer.read())

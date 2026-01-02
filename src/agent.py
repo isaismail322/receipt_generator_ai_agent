@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 from pydantic_ai import Agent, RunContext
 from pydantic import BaseModel, Field
 import httpx
-from io import BytesIO
-from pdf_generator import pdf_receipt_generator
+# from io import BytesIO
+# from pdf_generator import pdf_receipt_generator
 # from airbyte_agent_github import GithubConnector
 # from airbyte_agent_github.models import GithubGithubPersonalAccessTokenAuthConfig
 load_dotenv()
@@ -19,15 +19,18 @@ load_dotenv()
 # Environment Variables
 AIRTABLE_TOKEN = os.environ["AIRTABLE_TOKEN"]
 BASE_ID = os.environ["BASE_ID"] # Please replace with your actual Airtable Base ID (starts with 'app')
-TABLE_NAME = os.environ["TABLE_NAME"]
+RECEIPT_TABLE_NAME = os.environ["RECEIPT_TABLE_NAME"]
 PRIMARY_KEY_FIELD = os.environ["PRIMARY_KEY_FIELD"]
+RESERVATION_TABLE_NAME = os.environ["RESERVATION_TABLE_NAME"]
+
 
 
 agent = Agent(
     "openai:gpt-5-nano",
     system_prompt=(
         "You are a helpful assistant that can access Data table to "
-        "query the results and generate the receipts. Use the available tools to answer questions about "
+        "query the results, generate the receipts, create and cancel the reservations. "
+        "Use the available tools to answer questions about "
         "Receipts data. Be concise and accurate in your responses."
     ),
 )
@@ -55,9 +58,25 @@ class AirtableFetchInput(BaseModel):
     view: str = Field("Grid view", description="Airtable view name")
 
 
+# 2️⃣ DEFINE INPUT MODEL FOR CREATING RESERVATION
+class AirtableCreateReservationInput(BaseModel):
+    passenger_name: str = Field(..., description="Name of the passenger")
+    car_type: str = Field(..., description="Type of car requested")
+    pickup_time: str = Field(..., description="Pickup date and time")
+    dropoff_time: str = Field(..., description="Drop-off date and time")
+    contact_number: str = Field(..., description="Customer contact number")
+    pickup_address: str = Field(..., description="Pickup location address")
+    dropoff_address: str = Field(..., description="Drop-off location address")
+
+# 3️⃣ DEFINE INPUT MODEL FOR CANCELLING RESERVATION
+class AirtableCancelReservationInput(BaseModel):
+    reservation_number: int = Field(..., description="Reservation number (primary key) to cancel")
+
+
+
  # Tool to get the available receipt data from the connected database
 @agent.tool
-async def fetch_airtable_records(
+async def fetch_records(
     ctx: RunContext,
     args: AirtableFetchInput
     ) -> list[dict]:
@@ -65,7 +84,7 @@ async def fetch_airtable_records(
     Fetch records from Airtable by Name (primary key).
     """
 
-    url = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_NAME}"
+    url = f"https://api.airtable.com/v0/{BASE_ID}/{RECEIPT_TABLE_NAME}"
 
     headers = {
         "Authorization": f"Bearer {AIRTABLE_TOKEN}",
@@ -82,7 +101,7 @@ async def fetch_airtable_records(
         "view": args.view
     }
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=30) as client:
         response = await client.get(url, headers=headers, params=params)
         response.raise_for_status()
 
@@ -101,3 +120,118 @@ async def fetch_airtable_records(
     #     )
     #     for r in response.json()["records"]
     # ]
+
+
+@agent.tool
+async def create_reservation(
+    ctx: RunContext,
+    args: AirtableCreateReservationInput
+) -> dict:
+    """
+    Create a new reservation record in with customer details.
+    """
+    
+    url = f"https://api.airtable.com/v0/{BASE_ID}/{RESERVATION_TABLE_NAME}"
+    
+    headers = {
+        "Authorization": f"Bearer {AIRTABLE_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    
+    # Prepare the record data - adjust field names to match your Airtable schema
+    record_data = {
+        "records": [
+            {
+                "fields": {
+                    "Name": args.passenger_name,
+                    "Car_Type": args.car_type,
+                    "Pickup_Time": args.pickup_time,
+                    "Dropoff_Time": args.dropoff_time,
+                    "Contact_Number": args.contact_number,
+                    "Pickup_Address": args.pickup_address,
+                    "Dropoff_Address": args.dropoff_address,
+                    "Reservation_Type": "New_Reservation"
+                    # "Reservation": will be auto-generated if it's an auto-number field
+                }
+            }
+        ]
+    }
+    
+    async with httpx.AsyncClient(timeout=30) as client:
+        response = await client.post(url, headers=headers, json=record_data)
+        response.raise_for_status()
+    
+    created_record = response.json().get("records", [])[0]
+    
+    return {
+        "success": True,
+        "record_id": created_record.get("id"),
+        "reservation_number": created_record.get("fields").get("Reservation_Number",{}), # .get("fields").get("Reservation_Number"),
+        "fields": created_record.get("records", {}),
+        "message": f"Reservation created successfully for {args.passenger_name}"
+    }
+
+
+
+# Tool to cancel a reservation in Airtable
+@agent.tool
+async def cancel_reservation(
+    ctx: RunContext,
+    args: AirtableCancelReservationInput
+) -> dict:
+    """
+    Cancel a reservation by updating the reservation type field to 'cancelled reservation'.
+    """
+    
+    # Step 1: First, find the record by reservation number to get its record ID
+    fetch_url = f"https://api.airtable.com/v0/{BASE_ID}/{RESERVATION_TABLE_NAME}"
+    
+    headers = {
+        "Authorization": f"Bearer {AIRTABLE_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    
+    # Find the record using filterByFormula
+    formula = f"{{Reservation_Number}}={int(args.reservation_number)}"
+    params = {
+        "filterByFormula": formula,
+        "maxRecords": 1
+    }
+    
+    async with httpx.AsyncClient(timeout=30) as client:
+        # Fetch the record
+        response = await client.get(fetch_url, headers=headers, params=params)
+        response.raise_for_status()
+        
+        records = response.json().get("records", [])
+        
+        if not records:
+            return {
+                "success": False,
+                "message": f"Reservation {args.reservation_number} not found"
+            }
+        
+        # Get the Airtable record ID
+        record_id = records[0]["id"]
+        
+        # Step 2: Update the record
+        update_url = f"https://api.airtable.com/v0/{BASE_ID}/{RESERVATION_TABLE_NAME}/{record_id}"
+        
+        update_data = {
+            "fields": {
+                "Reservation_Type": "Cancelled_Reservation"  # Adjust field name to match your Airtable
+            }
+        }
+        
+        # Update the record using PATCH
+        update_response = await client.patch(update_url, headers=headers, json=update_data)
+        update_response.raise_for_status()
+        
+        updated_record = update_response.json()
+        
+        return {
+            "success": True,
+            "reservation_number": args.reservation_number,
+            "message": f"Reservation {args.reservation_number} has been cancelled successfully",
+            "updated_fields": updated_record.get("fields", {})
+        }
