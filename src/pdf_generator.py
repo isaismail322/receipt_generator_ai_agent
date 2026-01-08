@@ -4,7 +4,8 @@ from io import BytesIO
 
 
 def pdf_receipt_generator(data_input_api):
-    data = data_input_api[0].get("fields", {})
+    # data = data_input_api[0].get("fields", {})
+    data = data_input_api.get("fields", {})
     # Create PDF
     # pdf_file = "trip_receipt.pdf"
     pdf_buffer = BytesIO()

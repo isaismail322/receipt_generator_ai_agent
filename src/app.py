@@ -14,6 +14,13 @@ if "messages" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = None
 
+if "tool_data" not in st.session_state:
+    st.session_state.tool_data = []
+
+if "pdfs" not in st.session_state:
+    st.session_state.pdfs = []
+
+
 # Display chat history
 for msg in st.session_state.messages:
     role = msg["role"]
@@ -33,6 +40,10 @@ if prompt := st.chat_input("Type your message..."):
         message_placeholder = st.empty()
         message_placeholder.markdown("Typing...")
 
+    st.session_state.tool_data = []
+    st.session_state.pdfs = []
+
+
     # Call agent
     response = ask_agent_sync(prompt, st.session_state.history)
     st.session_state.history = response["history"]
@@ -45,13 +56,13 @@ if prompt := st.chat_input("Type your message..."):
     # message_placeholder.markdown(response)
     # response
 
-    tool_data = []
+    # st.session_state.tool_data = []
     for entry in response["history"]:
         if entry.__class__.__name__ == "ModelRequest":
             for parts in entry.parts:
                 if parts.__class__.__name__ == "ToolReturnPart":
                     if parts.tool_name == "fetch_records":
-                        tool_data.extend(parts.content)
+                        st.session_state.tool_data.extend(parts.content)
                         # print(parts.content)
 
 
@@ -64,14 +75,24 @@ if prompt := st.chat_input("Type your message..."):
     #             if part.__class__.__name__ == "ToolReturnPart":
     #                 tool_data.extend(part.content)  # This is your Airtable records
 
-    if tool_data:  # Only if the tool returned data
-        pdf_buffer = pdf_receipt_generator(tool_data)
+    if st.session_state.tool_data and not st.session_state.pdfs:
+        for item in st.session_state.tool_data:
+            pdf_buffer = pdf_receipt_generator(item)
+            st.session_state.pdfs.append(pdf_buffer)  # Only if the tool returned data
+
+
+if st.session_state.pdfs:
+    st.markdown("### 📄 Available Receipts") 
+    
+    for idx, item in enumerate(st.session_state.pdfs, start=1):
+        # pdf_buffer = pdf_receipt_generator(item)
         st.download_button(
-            label="📄 Download Receipt",
-            data=pdf_buffer,
-            file_name="trip_receipt.pdf",
-            mime="application/pdf"
-        )
+            label=f"📄 Download Receipt {idx}",
+            data=item,
+            file_name=f"trip_receipt_{idx}.pdf",
+            mime="application/pdf",
+            key=f"download_{idx}"
+            )
 
 
     # Test the pdf_generator separately
@@ -106,3 +127,10 @@ st.markdown("---")
 st.markdown(
     "Created with :heart: using **Streamlit** and **Airbyte**."
 )
+
+
+
+import logging
+logging.basicConfig(level=logging.INFO)
+
+logging.info(f"Tool records found: {len(st.session_state.tool_data)}")
