@@ -1,7 +1,8 @@
 # airbyte-agent-github>=0.18.21
 pydantic-ai>=1.33.0
 reportlab==4.4.7
-streamlit==1.27.0
+streamlit==1.52.2
+# streamlit==1.27.0
 nest_asyncio==1.5.8
 requests
 

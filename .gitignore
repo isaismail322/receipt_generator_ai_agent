@@ -12,3 +12,9 @@ wheels/
 .env
 # Python Files
 update_requirements.py
+pyproject.toml
+uv.lock
+.gitattributes
+README.md
+.python-version
+Docekrfile
