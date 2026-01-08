@@ -2,39 +2,110 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
+# app.py
+# from main import ask_agent_sync
+# from pdf_generator import pdf_receipt_generator
 
-"""
-# Welcome to Streamlit!
+st.set_page_config(page_title="Receipt Generator Agent", page_icon=":robot:")
+st.title("Receipt Chatbot")
+st.write("Chat with the Receipt agent about Receipts")
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+# Initialize chat session
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+if "history" not in st.session_state:
+    st.session_state.history = None
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+# Display chat history
+for msg in st.session_state.messages:
+    role = msg["role"]
+    content = msg["content"]
+    with st.chat_message(role):
+        st.markdown(content)
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+# User input
+if prompt := st.chat_input("Type your message..."):
+    # Append user message
+    st.session_state.messages.append({"role": "user", "content": prompt})
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        message_placeholder.markdown("Typing...")
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+    # Call agent
+    response = ask_agent_sync(prompt, st.session_state.history)
+    st.session_state.history = response["history"]
+
+    # Append agent response
+    st.session_state.messages.append({"role": "assistant", "content": response["output"]})
+
+    # Replace placeholder with actual response
+    message_placeholder.markdown(response["output"])
+    # message_placeholder.markdown(response)
+    # response
+
+    tool_data = []
+    for entry in response["history"]:
+        if entry.__class__.__name__ == "ModelRequest":
+            for parts in entry.parts:
+                if parts.__class__.__name__ == "ToolReturnPart":
+                    if parts.tool_name == "fetch_records":
+                        tool_data.extend(parts.content)
+                        # print(parts.content)
+
+
+
+    # 
+    # for entry in response.get("history", []):
+    #     model_response = getattr(entry, "model_response", None)
+    #     if model_response:
+    #         for part in getattr(model_response, "parts", []):
+    #             if part.__class__.__name__ == "ToolReturnPart":
+    #                 tool_data.extend(part.content)  # This is your Airtable records
+
+    if tool_data:  # Only if the tool returned data
+        pdf_buffer = pdf_receipt_generator(tool_data)
+        st.download_button(
+            label="📄 Download Receipt",
+            data=pdf_buffer,
+            file_name="trip_receipt.pdf",
+            mime="application/pdf"
+        )
+
+
+    # Test the pdf_generator separately
+# if st.button("Test PDF Generation"):
+#     test_data = {
+#         "trip_id": "12345",
+#         "passenger_name": "John Doe",
+#         "pickup": "123 Main St",
+#         "dropoff": "456 Oak Ave",
+#         "fare": "$25.00",
+#         "date": "2025-01-01"
+#         }
+    
+#     try:
+#         pdf_buffer = pdf_receipt_generator(test_data)
+#         st.download_button(
+#             label="📄 Download Test Receipt",
+#             data=pdf_buffer,
+#             file_name="test_receipt.pdf",
+#             mime="application/pdf"
+#         )
+#     except Exception as e:
+#         st.error(f"PDF generation error: {str(e)}")
+
+#    st.experimental_rerun()
+
+
+# -----------------------
+# Footer / credits
+# -----------------------
+st.markdown("---")
+st.markdown(
+    "Created with :heart: using **Streamlit** and **Airbyte**."
+)
