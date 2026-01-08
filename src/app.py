@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 # app.py
-# from main import ask_agent_sync
+from main import ask_agent_sync
 # from pdf_generator import pdf_receipt_generator
 
 st.set_page_config(page_title="Receipt Generator Agent", page_icon=":robot:")
