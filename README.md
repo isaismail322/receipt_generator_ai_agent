@@ -13,7 +13,204 @@ short_description: Streamlit template space
 
 # Welcome to Streamlit!
 
-Edit `/src/streamlit_app.py` to customize this app to your heart's desire. :heart:
+# 🚗 AI Ride Booking Agent
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+An intelligent, production-ready **AI Ride Booking Agent** that enables users to **create, update, cancel, and track ride bookings** using natural language.
+The agent integrates directly with a live database and generates **instant PDF receipts**, with upcoming support for **email delivery**.
+
+Built as a **portfolio and demo project** showcasing modern AI agent architecture, tool integration, and real-world automation.
+
+---
+## 🔗 Database Tables (Live View)
+Access the live Airtable tables used by the agent:
+👉 ## [Airtables](https://airtable.com/appCvsvzsT4gE3di7/shrRxXovvVtIV3vXn)
+
+## 🤖 Agent Live Demo
+Try the deployed agent on Hugging Face Spaces:
+👉 [AI Agent](https://huggingface.co/spaces/usama-ismail/airtable_agent)
+
+
+## ✨ Key Highlights
+
+* 🧠 **Hybrid LLM-powered reasoning**
+* 🖥️ **Streamlit-based interactive UI**
+* 🗄️ **Live Airtable database integration**
+* 📄 **On-the-spot PDF receipt generation**
+* 🔄 Full ride lifecycle management
+* ☁️ Deployed on **Hugging Face Spaces**
+* 🔐 Secure environment variable handling
+
+---
+
+## 🧩 Capabilities
+
+The AI agent supports the complete ride booking lifecycle:
+
+### 🚕 Ride Management
+
+* ✅ Create new ride bookings
+* ✏️ Update ride details (pickup, drop, time)
+* ❌ Cancel existing rides
+* 🔍 Fetch ride details using reservation number
+* 📊 Track ride status:
+
+  * `Pending`
+  * `Confirmed`
+  * `Cancelled`
+
+### 💰 Pricing & Receipts
+
+* Automatic **price calculation**
+* **PDF receipt generation**
+* Includes:
+
+  * Reservation ID
+  * Customer details
+  * Pickup & drop locations
+  * Ride time
+  * Fare breakdown
+  * Ride status
+
+📬 *Upcoming*: Email delivery of receipts to customers
+
+---
+
+## 🖥️ User Interface
+
+The agent is accessed through a **Streamlit web interface**, allowing users to:
+
+* Interact in natural language
+* Submit ride requests
+* Retrieve bookings instantly
+* Download PDF receipts
+* View real-time data updates
+
+The UI is optimized for **live demos, recruiters, and client walkthroughs**.
+
+---
+
+## 🏗️ Architecture Overview
+
+```
+User
+ ↓
+Streamlit UI
+ ↓
+AI Agent (Hybrid LLM Reasoning)
+ ↓
+Tool Layer (Validated via Pydantic)
+ ↓
+Airtable Database (Live)
+ ↓
+PDF Receipt Generator
+```
+
+---
+
+## 🧠 AI Reasoning Layer
+
+The agent uses a **Hybrid LLM Architecture**, combining:
+
+* Large Language Model reasoning
+* Structured tool invocation
+* Deterministic validation using **Pydantic schemas**
+
+This ensures:
+
+* Accurate intent understanding
+* Safe database operations
+* Strong input/output validation
+* Predictable behavior in production-like environments
+
+---
+
+## 🔧 Tools & Integrations
+
+### Core Technologies
+
+* **Python** – Core agent logic
+* **Streamlit** – User interface
+* **Pydantic** – Input & output validation
+* **Airtable** – Primary database
+* **Airbyte** – Data integration & pipeline demonstration
+* **PDF Generator** – Receipt creation
+
+### Database
+
+* Airtable acts as the **source of truth**
+* Live table link can be shared for real-time viewing
+* All ride operations directly reflect in the database
+
+---
+
+## 📄 Receipt Generation
+
+Receipts are generated as **PDF files** and made available immediately after booking or retrieval.
+
+### Receipt Includes:
+
+* Reservation number
+* Customer name
+* Pickup & drop location
+* Ride date & time
+* Ride status
+* Total fare
+
+📌 *Future Extension*: Automatic email delivery to customers
+
+---
+
+## 🚀 Deployment
+
+The project is deployed on **Hugging Face Spaces**, making it:
+
+* Publicly accessible
+* Easy to demo
+* Ideal for portfolio presentation
+
+### Environment Variables
+
+All sensitive credentials are securely stored using:
+
+* Hugging Face **Space Secrets**
+* No keys or tokens are hardcoded
+
+---
+
+## 🔐 Security & Privacy
+
+* API keys and credentials are **never exposed**
+* Environment variables handled via Space settings
+* No sensitive customer data is logged
+* Designed with production security best practices in mind
+
+---
+
+## 🧪 Example Use Cases
+
+* “Book a ride from Downtown to Airport at 6 PM”
+* “Update my ride pickup location”
+* “Cancel reservation RIDE-1023”
+* “Get details for reservation RIDE-2041”
+* “Download my receipt”
+
+---
+
+## 📈 Future Roadmap
+
+* 📧 Email receipt delivery
+* 📱 SMS ride confirmations
+* 🔄 Multi-database support
+* 📊 Admin dashboard
+* 🧾 Invoice customization
+* 🤖 Voice-based booking
+---
+
+## 🤝 Contact
+
+For demos, collaboration, or customization inquiries, feel free to connect.
+isa.ismail.322@gmail.com
+---
+
+> **This project demonstrates how AI agents can move beyond chat and perform real, validated, business-critical operations.**
+
