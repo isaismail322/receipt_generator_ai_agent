@@ -1,0 +1,13 @@
+[project]
+name = "my-agent-app-demo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "airbyte-agent-github>=0.18.21",
+    "pydantic-ai>=1.33.0",
+    "reportlab==4.4.7",
+    "streamlit>=1.33.0",
+    "nest_asyncio==1.5.8",
+]

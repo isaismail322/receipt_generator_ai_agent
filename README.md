@@ -21,6 +21,14 @@ The agent integrates directly with a live database and generates **instant PDF r
 Built as a **portfolio and demo project** showcasing modern AI agent architecture, tool integration, and real-world automation.
 
 ---
+## 🔗 Database Tables (Live View)
+Access the live Airtable tables used by the agent:
+👉 ## [Airtables](https://airtable.com/appCvsvzsT4gE3di7/shrRxXovvVtIV3vXn)
+
+## 🤖 Agent Live Demo
+Try the deployed agent on Hugging Face Spaces:
+👉 [AI Agent](https://huggingface.co/spaces/usama-ismail/airtable_agent)
+
 
 ## ✨ Key Highlights
 
@@ -196,29 +204,13 @@ All sensitive credentials are securely stored using:
 * 📊 Admin dashboard
 * 🧾 Invoice customization
 * 🤖 Voice-based booking
-
----
-
-## 🎯 Target Audience
-
-* **Recruiters** evaluating AI agent design
-* **Clients** exploring automation use cases
-* **Developers** interested in tool-based AI agents
-* **Startups** building booking or logistics systems
-
----
-
-## 📜 License
-
-This project is released for **demo and portfolio purposes**.
-License can be updated as required.
-
 ---
 
 ## 🤝 Contact
 
 For demos, collaboration, or customization inquiries, feel free to connect.
-
+isa.ismail.322@gmail.com
 ---
 
 > **This project demonstrates how AI agents can move beyond chat and perform real, validated, business-critical operations.**
+
