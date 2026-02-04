@@ -3,9 +3,9 @@ import streamlit as st
 from main import ask_agent_sync
 from pdf_generator import pdf_receipt_generator
 
-st.set_page_config(page_title="Receipt Generator Agent", page_icon=":robot:")
-st.title("Receipt Chatbot")
-st.write("Chat with the Receipt agent about Receipts")
+st.set_page_config(page_title="Intelligent Booking Agent", page_icon=":robot:")
+st.title("Velora AI Agent")
+st.write("Chat with Velora about Bookings and Receipts")
 
 # Initialize chat session
 if "messages" not in st.session_state:
@@ -124,9 +124,9 @@ if st.session_state.pdfs:
 # Footer / credits
 # -----------------------
 st.markdown("---")
-st.markdown(
-    "Created with :heart: using **Streamlit** and **Airbyte**."
-)
+# st.markdown(
+#     "Created with :heart: using **Streamlit** and **Airbyte**."
+# )
 
 
 
